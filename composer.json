@@ -1,0 +1,17 @@
+{
+    "name": "adeba/ring-central",
+    "autoload": {
+        "psr-4": {
+            "Adeba\\RingCentral\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "oluwapaso",
+            "email": "adebayoishola01@gmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^12.54"
+    }
+}

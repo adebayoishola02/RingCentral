@@ -24,7 +24,7 @@ class RingCentralAccountController
     }
 
     /**
-     * Display a listing of the twilio accounts (paginated).
+     * Display a listing of the RC accounts (paginated).
      */
     public function index(Request $request)
     {

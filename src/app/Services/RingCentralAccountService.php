@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\RingCentralAccount;
+use App\Models\RingCentralMessage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class RingCentralAccountService
@@ -75,7 +77,14 @@ class RingCentralAccountService
     public function delete(RingCentralAccount $account): bool
     {
         return DB::transaction(function () use ($account) {
-            return $account->delete(); // or forceDelete() if not soft-deleting
+
+            // Delete All Related Data (Nuclear Option)
+            $this->handleRelatedDataOnDisconnect($account);
+
+            // Delete All Related Data (keep records)
+            // $this->handleRelatedDataOnDisconnectSoft($account);
+
+            return $account->forceDelete(); // or delete() if soft-deleting
         });
     }
 
@@ -120,5 +129,21 @@ class RingCentralAccountService
         }
 
         return $rcsdk;
+    }
+
+    private function handleRelatedDataOnDisconnectSoft(RingCentralAccount $account)
+    {
+        RingCentralMessage::where('account_uuid', $account->uuid)->update(['account_uuid' => null]);
+        Log::info("Ring Central Account disconnected. Data preserved.", [
+            'account_uuid' => $account->uuid
+        ]);
+    }
+
+    private function handleRelatedDataOnDisconnect(RingCentralAccount $account)
+    {
+        RingCentralMessage::where('account_uuid', $account->uuid)->delete();
+        Log::info("Ring Central Account + all related data deleted.", [
+            'account_uuid' => $account->uuid
+        ]);
     }
 }
